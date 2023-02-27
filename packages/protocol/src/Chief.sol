@@ -168,7 +168,7 @@ contract Chief is CoreRoles, AccessControl, IChief {
     address[] memory previous = _vaults;
     delete _vaults;
     _vaults = vaults;
-    emit SetVaults(previous, _vaults);
+    emit SetVaults(previous, vaults);
   }
 
   /**

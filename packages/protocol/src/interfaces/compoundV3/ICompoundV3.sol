@@ -10,11 +10,13 @@ pragma solidity 0.8.15;
  * This interface has been reduced from the Comet main interface.
  */
 interface ICompoundV3 {
+
+  //@audit We can save one Storage SLOT here by packing variables
   struct AssetInfo {
     uint8 offset;
+    uint64 scale;
     address asset;
     address priceFeed;
-    uint64 scale;
     uint64 borrowCollateralFactor;
     uint64 liquidateCollateralFactor;
     uint64 liquidationFactor;

@@ -23,7 +23,7 @@ contract UniswapV2Swapper is ISwapper {
   error UniswapV2Swapper__swap_slippageTooHigh();
   error UniswapV2Swapper__swap_notEnoughAmountIn();
 
-  IUniswapV2Router01 public uniswapRouter;
+  IUniswapV2Router01 public immutable uniswapRouter;
 
   IWETH9 public immutable WETH9;
 

@@ -91,8 +91,11 @@ abstract contract VaultDeployer {
     returns (address[] memory vaults)
   {
     vaults = new address[](count);
-    for (uint256 i = 0; i < count; i++) {
+    for (uint256 i = 0; i < count;) {
       vaults[i] = vaultsByAsset[asset][startIndex + i];
+      unchecked {
+        ++i;
+      }
     }
   }
 

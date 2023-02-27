@@ -230,8 +230,9 @@ contract YieldVault is BaseVault {
       if (address(providers[i]) == address(0)) {
         revert BaseVault__setter_invalidInput();
       }
-      IERC20(asset()).approve(
-        providers[i].approvedOperator(asset(), asset(), debtAsset()), type(uint256).max
+      address assetTemp = asset();
+      IERC20(assetTemp).approve(
+        providers[i].approvedOperator(assetTemp, assetTemp, debtAsset()), type(uint256).max
       );
       unchecked {
         ++i;

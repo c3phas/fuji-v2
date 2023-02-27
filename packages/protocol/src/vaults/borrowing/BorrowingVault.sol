@@ -488,7 +488,7 @@ contract BorrowingVault is BaseVault {
    * @param amount of shares
    */
   function _mintDebtShares(address owner, uint256 amount) internal {
-    debtSharesSupply += amount;
+    debtSharesSupply = debtSharesSupply + amount;
     _debtShares[owner] += amount;
   }
 
@@ -506,7 +506,7 @@ contract BorrowingVault is BaseVault {
     unchecked {
       _debtShares[owner] = balance - amount;
     }
-    debtSharesSupply -= amount;
+    debtSharesSupply = debtSharesSupply - amount;
   }
 
   /*/////////////////
@@ -601,8 +601,9 @@ contract BorrowingVault is BaseVault {
     }
 
     // Compute debt amount that must be paid by liquidator.
-    uint256 debt = convertToDebt(_debtShares[owner]);
-    uint256 debtSharesToCover = Math.mulDiv(_debtShares[owner], liquidationFactor, 1e18);
+    uint256 debtSharesOwner = _debtShares[owner]; 
+    uint256 debt = convertToDebt(debtSharesOwner);
+    uint256 debtSharesToCover = Math.mulDiv(debtSharesOwner, liquidationFactor, 1e18);
     uint256 debtToCover = Math.mulDiv(debt, liquidationFactor, 1e18);
 
     // Compute `gainedShares` amount that the liquidator will receive.
@@ -663,7 +664,7 @@ contract BorrowingVault is BaseVault {
       revert BaseVault__setter_invalidInput();
     }
     maxLtv = maxLtv_;
-    emit MaxLtvChanged(maxLtv);
+    emit MaxLtvChanged(maxLtv_);
   }
 
   /**
@@ -682,7 +683,7 @@ contract BorrowingVault is BaseVault {
       revert BaseVault__setter_invalidInput();
     }
     liqRatio = liqRatio_;
-    emit LiqRatioChanged(liqRatio);
+    emit LiqRatioChanged(liqRatio_);
   }
 
   /// @inheritdoc BaseVault
@@ -692,11 +693,14 @@ contract BorrowingVault is BaseVault {
       if (address(providers[i]) == address(0)) {
         revert BaseVault__setter_invalidInput();
       }
-      IERC20(asset()).approve(
-        providers[i].approvedOperator(asset(), asset(), debtAsset()), type(uint256).max
+      address assetTemp = asset();
+      address _debtAssetTemp = debtAsset();
+      IERC20(assetTemp).approve(
+        providers[i].approvedOperator(assetTemp, assetTemp, _debtAssetTemp), type(uint256).max
       );
-      IERC20(debtAsset()).approve(
-        providers[i].approvedOperator(debtAsset(), asset(), debtAsset()), type(uint256).max
+      
+      IERC20(_debtAssetTemp).approve(
+        providers[i].approvedOperator(_debtAssetTemp, assetTemp, _debtAssetTemp), type(uint256).max
       );
       unchecked {
         ++i;
